@@ -3,6 +3,8 @@ import nltk
 import numpy as np
 from bs4 import BeautifulSoup
 
+
+
 positive_rive = BeautifulSoup(open('positive.review').read(),features="html.parser")
 positive_rive = positive_rive.findAll('review_text')
 
@@ -33,6 +35,31 @@ for k,words in trigrams.items():
             n +=1
         for w,c in d.items():
             d[w] = float(c) / n
-        trigram_probabilities[k ] = d
+        trigram_probabilities[k] = d
 
-print(trigram_probabilities)
+
+def random_sample(d):
+    r = random.random()
+    cumulative = 0
+    for w,p in d.items():
+        cumulative += p
+        if r<cumulative:
+            return w
+
+def test_spinner():
+    review = random.choice(positive_rive)
+    s = review.text.lower()
+    print("Original: ",s)
+    tokens = nltk.tokenize.word_tokenize(s)
+    for i in range(len(tokens) - 2):
+        if random.random() < 0.2:
+            k = (tokens[i],tokens[i+2])
+            if k in trigram_probabilities:
+                w = random_sample(trigram_probabilities[k])
+                tokens[i+1] = w
+    print("Spun: ")
+    print(" ".join(tokens))
+
+
+
+test_spinner()
